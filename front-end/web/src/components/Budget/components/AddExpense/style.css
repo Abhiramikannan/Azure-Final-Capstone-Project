@@ -1,0 +1,15 @@
+.add-expense-dialog-button {
+    background-color: #0658f6;
+    font-weight: 600;
+    color: white;
+    font-size: 13px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.add-expense-dialog-button:hover {
+    background-color: #3459e7;
+}

@@ -1,0 +1,12 @@
+.buttons{
+    margin-top: 1rem;
+}
+.btn-1{
+    margin-left: .5rem !important;
+}
+.btn-2{
+    margin-left:1rem  !important;
+}
+.totalTextField{
+    font-weight: 600 !important;
+}

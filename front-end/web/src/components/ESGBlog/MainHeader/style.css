@@ -1,0 +1,23 @@
+.esg-jumbotron{
+    display:flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.esg-heading{
+    margin-bottom: 16px;
+    line-height: 1.1;
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    font-weight: 600;
+    font-size: 64px;
+}
+.esg-subheading{
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    padding-bottom: 24px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+.esg-header-image{
+    text-align: center;
+}

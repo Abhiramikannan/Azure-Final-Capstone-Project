@@ -1,0 +1,23 @@
+.view-expense-dialog-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.view-expense-description {
+    font-weight: 600;
+    font-size: 15px;
+    color: #2c2c2c;
+}
+
+.view-expense-amount {
+    font-weight: 700;
+    font-size: 18px;
+    color: #0658f6;
+}
+
+.view-expense-date {
+    font-weight: 500;
+    font-size: 13px;
+    color: #828282;
+}

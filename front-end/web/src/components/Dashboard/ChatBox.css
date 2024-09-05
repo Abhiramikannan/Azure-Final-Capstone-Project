@@ -1,0 +1,211 @@
+/* General Styles */
+.dashboard-container {
+    width: calc(100% - 120px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 35px;
+    padding-top: 35px;
+}
+
+/* Chatbox Styles */
+.chatbox {
+    position: fixed;
+    bottom: 20px; /* Adjusted to give some space from the bottom */
+    right: 20px;  /* Adjusted to give some space from the right */
+    width: 300px;
+    max-height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Ensure it appears on top of other elements */
+}
+
+/* Title Bar Styles */
+.chatbox-title {
+    background-color: #0658f6;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px 5px 0 0; /* Rounded corners on the top */
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Messages Area Styles */
+.chatbox-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 5px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.message.user {
+    background-color: #e1ffc7;
+    align-self: flex-end;
+}
+
+.message.bot {
+    background-color: #f1f1f1;
+    align-self: flex-start;
+}
+
+/* Input Area Styles */
+.chatbox-input {
+    display: flex;
+}
+
+.chatbox-input input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    border-radius: 0 0 0 5px; /* Adjusted for bottom-right alignment */
+    outline: none; /* Remove the default outline */
+}
+
+.chatbox-input button {
+    border: none;
+    padding: 10px;
+    background-color: #0658f6;
+    color: #fff;
+    border-radius: 0 0 5px 0; /* Adjusted for bottom-right alignment */
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.chatbox-input button:hover {
+    background-color: #054ac9; /* Darker shade on hover */
+}
+
+/* Hide and unhide Chat Bot */
+
+#chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  #chatbot-logo {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+  }
+  
+  #chatbot-window {
+    display: none; /* Hidden by default */
+    width: 300px;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  #chatbot-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+  }
+  
+  #chatbot-body {
+    padding: 10px;
+    height: calc(100% - 40px); /* Adjust based on header height */
+    overflow-y: auto;
+  }
+  
+  #minimize-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+/* new style starts here */
+
+  #chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    height: auto;
+}
+
+#chatbot-logo {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+}
+
+#chatbot-window {
+    display: none;
+    width: 300px;
+    max-height: 400px;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.chatbox-title {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbox-messages {
+    padding: 10px;
+    height: calc(100% - 80px);
+    overflow-y: auto;
+}
+
+.chatbox-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.chatbox-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.chatbox-input button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#minimize-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+

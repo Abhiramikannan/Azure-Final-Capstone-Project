@@ -1,0 +1,63 @@
+/* Quiz.css */
+
+.quiz-container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #eaf4fc; /* Light blue background */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.question-section {
+    margin-bottom: 20px;
+}
+
+.question-count {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #007bff; /* Blue color for question count */
+}
+
+.question-text {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #004085; /* Darker blue for question text */
+}
+
+.answer-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.answer-section button {
+    background-color: #007bff; /* Primary blue color */
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.answer-section button:hover {
+    background-color: #0056b3; /* Darker blue for hover effect */
+}
+
+.score-section {
+    text-align: center;
+}
+
+.score-section h2 {
+    font-size: 2em;
+    color: #004085; /* Darker blue for score header */
+}
+
+.score-section p {
+    font-size: 1.2em;
+    color: #007bff; /* Blue color for score text */
+}

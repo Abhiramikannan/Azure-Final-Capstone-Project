@@ -1,0 +1,24 @@
+.esg-latest-articles{
+    max-width: 90%;
+    margin: auto;
+    padding: 24px 16px;
+}
+.esg-latest-articles h2{
+    font-size: 32px;
+    line-height: 40px;
+    word-break: break-word;
+    margin-left: 2rem;
+    font-weight: 600;
+}
+.esg-articles-container{
+    margin: auto;
+    background-color: rgb(255, 255, 255);
+    max-width: 87%;
+    padding: 24px 16px;
+}
+.esg-articles{
+    display: grid;
+    gap: 24px;
+    grid-template-rows: auto;
+    grid-template-columns:  1fr 1fr 1fr;
+}

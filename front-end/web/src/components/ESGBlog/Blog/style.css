@@ -1,0 +1,102 @@
+.esg-article{
+    display: block;
+}
+.esg-article-link{
+    position: relative;
+    height:100%;
+}
+a{
+    text-decoration: none;
+}
+.esg-article-badge{
+    position: absolute;
+    top:16px;
+    right:16px;
+    z-index:5;
+}
+.esg-article-badge-text{
+    align-items: center;
+    border-radius: 100px;
+    display: inline-flex;
+    font-weight: 600;
+    justify-content: center;
+    font-size: 12px;
+    height: 22px;
+    padding: 2px 12px;
+    background-color: rgb(56, 97, 251);
+    color: rgb(255, 255, 255);
+}
+.esg-article-category{
+    flex-direction: column;
+    align-items: start;
+    height: 100%;
+    display: flex;
+}
+.esg-article-image{
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: rgb(211, 211, 211);
+    border-radius: 16px;
+    max-width: 100%;
+    position: relative;
+    height:300px;
+    width:100%;
+}
+.esg-article-content{
+    margin-top: 24px;
+    margin-bottom: 24px;
+    flex: 1 1 0%;
+}
+.esg-article-title{
+    color: rgb(56, 97, 251);
+    line-height: 1.5;
+    padding-bottom: 4px;
+}
+.esg-article-subtitle{
+    font-size: 18px;
+    line-height: 28px;
+    word-break: break-word;
+    color: rgb(20, 21, 26);
+    margin-bottom: 8px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+.esg-article-description{
+    color: rgb(118, 128, 143);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+.esg-article-author-info{
+    padding-bottom: 8px;
+    font-size: 12px;
+    -webkit-box-align: center;
+    align-items: center;
+    display: flex;
+}
+.esg-article-author-name{
+    color: rgb(118, 128, 143);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+.esg-article-author-info-2{
+    padding-bottom: 24px;
+    -webkit-box-align: center;
+    align-items: center;
+    display: flex;
+}
+.esg-article-author{
+    color: rgb(118, 128, 143);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+.esg-article-read-time{
+    color: rgb(118, 128, 143);
+    margin-left: 4px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+}

@@ -1,0 +1,108 @@
+/* Container styles */
+.login-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: url('../../assets/business-candle-stick-graph-chart-of-stock-market-investment-trading-on-white-background-design-bullish-point-trend-of-graph-illustration-free-vector.jpg') no-repeat;
+    background-size: cover;
+    background-position: bottom;
+    background-color: #fff; /* Bootstrap's primary black color */
+}
+
+.login-form-container {
+    background-color: #ffffff; /* White for the form background */
+    padding: 30px 40px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    width: 20%;
+    box-shadow: 0 4px 16px 0 rgba(31, 38, 135, .12);
+    border: 1px solid rgba(255, 255, 255, .18);
+}
+
+/* Header styles */
+.login-container-header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container-header-logo {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container-header-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #212529; /* Bootstrap's text color */
+}
+
+/* Form styles */
+.login-form {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.login-form-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    width: 100%;
+}
+
+.login-form-input {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #212529; /* Bootstrap's text color */
+    width: calc(100% - 24px);
+    text-align: left;
+    border: 1px solid #ced4da; /* Bootstrap's border color */
+    border-radius: .25rem; /* Bootstrap's border-radius */
+}
+
+.login-form-input:focus {
+    outline: none;
+    border-color: #0658f6; /* Bootstrap's primary color */
+    box-shadow: 0 0 0 .2rem rgba(38, 143, 255, .25); /* Bootstrap's focus shadow color */
+}
+
+.login-form-button {
+    width: 100%;
+    background-color: #0658f6; /* Bootstrap's primary color */
+    border: none;
+    padding: 12px 15px;
+    cursor: pointer;
+    border-radius: .375rem; /* Bootstrap's border-radius */
+    color: #ffffff; /* White text color */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 8px;
+}
+
+.login-form-register-link {
+    font-weight: 600;
+    font-size: 15px;
+    color: #6c757d; /* Bootstrap's secondary color */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
