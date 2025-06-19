@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
 
     private final UserService userService;
@@ -31,20 +32,20 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
     @GetMapping("/{userID}")
     public ResponseEntity<User> getUserById(@PathVariable String userID) {
         Optional<User> user = userService.getUserById(userID);
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                   .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest loginRequest) {
-        String result= userService.login(loginRequest);
-
-        if(result!=null){
+        String result = userService.login(loginRequest);
+        if (result != null) {
             return result;
         }
         return null;
-
     }
 }
