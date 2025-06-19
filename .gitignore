@@ -1,0 +1,6 @@
+terraform-code/.terraform/
+terraform-code/*.tfstate
+terraform-code/*.tfstate.*
+terraform-code/.terraform.lock.hcl
+*.tfplan
+*.backup
