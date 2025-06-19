@@ -8,4 +8,6 @@ resource "azurerm_container_registry" "acr" {
   identity {
     type = "SystemAssigned"
   }
+
+  depends_on = [azurerm_resource_group.myrg]
 }
