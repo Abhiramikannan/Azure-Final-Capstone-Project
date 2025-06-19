@@ -159,7 +159,7 @@ public PortfolioResponse updatePortfolio(String portfolioId, PortfolioRequest po
 
     //    to get all details of stocks by stockId
     public StockTemplate getAllStocksDetails(String stockId) {
-        return webClient.get().uri("http://localhost:8080/stock/" + stockId).retrieve()
+        return webClient.get().uri("http://localhost:8081/stock/" + stockId).retrieve()
                 .bodyToMono(StockTemplate.class).block();
     }
     public void buyStock(int numberOfStocks, String stockId, String portfolioId) throws PortfolioNotFoundException, StockNotFoundException {
@@ -169,7 +169,7 @@ public PortfolioResponse updatePortfolio(String portfolioId, PortfolioRequest po
 
         // Retrieve stock information or throw an exception if it doesn't exist
         List<StockTemplate> stocks = webClient.get()
-                .uri("http://localhost:8080/stock/getAll/" + stockId)
+                .uri("http://localhost:8081/stock/getAll/" + stockId)
                 .retrieve()
                 .bodyToFlux(StockTemplate.class)
                 .collectList()
@@ -235,7 +235,7 @@ public PortfolioResponse updatePortfolio(String portfolioId, PortfolioRequest po
 
         // Retrieve stock templates for the stock IDs from a web service
         List<StockTemplate> templates = webClient.get()
-                .uri("http://localhost:8080/stock/getAll/" + stockIds)
+                .uri("http://localhost:8081/stock/getAll/" + stockIds)
                 .retrieve()
                 .bodyToFlux(StockTemplate.class)
                 .collectList()
@@ -287,7 +287,7 @@ public PortfolioResponse updatePortfolio(String portfolioId, PortfolioRequest po
 
         // Retrieve stock information for the given stock ID or throw an exception if it doesn't exist
         List<StockTemplate> stocks = webClient.get()
-                .uri("http://localhost:8080/stock/getAll/" + stockId)
+                .uri("http://localhost:8081/stock/getAll/" + stockId)
                 .retrieve()
                 .bodyToFlux(StockTemplate.class)
                 .collectList()
@@ -349,7 +349,7 @@ public PortfolioResponse updatePortfolio(String portfolioId, PortfolioRequest po
             if (stock.isPresent()) {
                 // Retrieve stock information from a web service
                 List<StockTemplate> stocks = webClient.get()
-                        .uri("http://localhost:8080/stock/getAll/" + stockId)
+                        .uri("http://localhost:8081/stock/getAll/" + stockId)
                         .retrieve()
                         .bodyToFlux(StockTemplate.class)
                         .collectList()
