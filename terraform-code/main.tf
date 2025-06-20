@@ -169,6 +169,63 @@ resource "azurerm_kubernetes_cluster_node_pool" "usernp2" {
  
   depends_on = [azurerm_subnet.vnet2_subnet2]
 }
+resource "azurerm_key_vault" "my_keyvault" {
+  name                       = "abhi-keyvault" # Changed Key Vault name as requested
+  location                   = var.location
+  resource_group_name        = azurerm_resource_group.myrg.name
+  sku_name                   = "standard" # Use "premium" for HSM-backed keys
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days = 7 # Minimum 7 days, max 90 days.
+  purge_protection_enabled   = true # Recommended for production: Prevents immediate permanent deletion
+}
+
+# User Assigned Managed Identity: This identity will be used by AKS to access the Key Vault
+resource "azurerm_user_assigned_identity" "aks_kv_identity" {
+  resource_group_name = azurerm_resource_group.myrg.name
+  location            = var.location
+  name                = "abhi-aks-kv-identity"
+}
+
+# Key Vault Access Policy: Grants the User Assigned Identity permissions to read secrets
+resource "azurerm_key_vault_access_policy" "kv_access_for_aks" {
+  key_vault_id = azurerm_key_vault.my_keyvault.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_user_assigned_identity.aks_kv_identity.principal_id
+
+  secret_permissions = [
+    "Get",  # Allows AKS to retrieve the actual secret values
+    "List"  # Allows AKS to list the names of secrets (often needed by CSI driver)
+  ]
+
+  depends_on = [
+    azurerm_key_vault.my_keyvault,
+    azurerm_user_assigned_identity.aks_kv_identity
+  ]
+}
+
+# Key Vault Secret: Stores the database username. Value comes from a Terraform variable.
+resource "azurerm_key_vault_secret" "db_username_secret" {
+  name         = "DbUsername" # The name of this secret within Azure Key Vault
+  value        = var.db_username # <-- VALUE COMES FROM YOUR INPUT (terminal or pipeline)
+  key_vault_id = azurerm_key_vault.my_keyvault.id
+  content_type = "text/plain" # Optional: Describes the type of content
+
+  depends_on = [
+    azurerm_key_vault.my_keyvault # Ensure Key Vault is created before storing secrets
+  ]
+}
+
+# Key Vault Secret: Stores the database password. Value comes from a Terraform variable.
+resource "azurerm_key_vault_secret" "db_password_secret" {
+  name         = "DbPassword" # The name of this secret within Azure Key Vault
+  value        = var.db_password # <-- VALUE COMES FROM YOUR INPUT (terminal or pipeline)
+  key_vault_id = azurerm_key_vault.my_keyvault.id
+  content_type = "text/plain" # Optional: Describes the type of content
+
+  depends_on = [
+    azurerm_key_vault.my_keyvault # Ensure Key Vault is created before storing secrets
+  ]
+}
 
 variable "resource_group_name" {
   description = "The name of the Resource Group"
@@ -192,5 +249,16 @@ variable "vnet2_location" {
   description = "Azure region for VNet2"
   type        = string
   default     = "West Europe"
+}
+variable "db_username" {
+  description = "The username for the database. This is a SENSITIVE value."
+  type        = string
+  sensitive   = true # Marks the variable as sensitive, preventing its value from being shown in CLI output
+}
+
+variable "db_password" {
+  description = "The password for the database. This is a SENSITIVE value."
+  type        = string
+  sensitive   = true # Marks the variable as sensitive
 }
  
