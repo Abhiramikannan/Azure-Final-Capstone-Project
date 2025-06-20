@@ -234,32 +234,40 @@ resource "azurerm_key_vault" "kv_westeurope" {
   purge_protection_enabled   = true
 }
 
-# Access Policy for Key Vault in Central India
-resource "azurerm_key_vault_access_policy" "kv_access_for_aks_centralindia" {
+# IMPORTANT: These access policies grant the IDENTITY RUNNING THIS TERRAFORM
+# permissions to manage secrets in your Key Vaults.
+# The 'object_id' below is taken from the 'oid' in your previous error message.
+
+resource "azurerm_key_vault_access_policy" "kv_access_for_terraform_executor_centralindia" {
   key_vault_id = azurerm_key_vault.kv_centralindia.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_user_assigned_identity.aks_kv_identity.principal_id
 
-  secret_permissions = ["Get", "List"]
+  # THIS IS YOUR OBJECT ID FROM THE PREVIOUS ERROR MESSAGE
+  # 'oid=3cb026dd-3f46-470c-b65c-e0bd92d4fd19'
+  object_id    = "3cb026dd-3f46-470c-b65c-e0bd92d4fd19" 
+
+  # Permissions needed for Terraform to 'Get', 'List', 'Set' (create/update), and 'Delete' secrets
+  secret_permissions = ["Get", "List", "Set", "Delete"]
+
   depends_on = [
-    azurerm_key_vault.kv_centralindia,
-    azurerm_user_assigned_identity.aks_kv_identity
+    azurerm_key_vault.kv_centralindia
   ]
 }
 
-# Access Policy for Key Vault in West Europe
-resource "azurerm_key_vault_access_policy" "kv_access_for_aks_westeurope" {
+resource "azurerm_key_vault_access_policy" "kv_access_for_terraform_executor_westeurope" {
   key_vault_id = azurerm_key_vault.kv_westeurope.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_user_assigned_identity.aks_kv_identity.principal_id
 
-  secret_permissions = ["Get", "List"]
+  # THIS IS YOUR OBJECT ID FROM THE PREVIOUS ERROR MESSAGE
+  # 'oid=3cb026dd-3f46-470c-b65c-e0bd92d4fd19'
+  object_id    = "3cb026dd-3f46-470c-b65c-e0bd92d4fd19"
+
+  secret_permissions = ["Get", "List", "Set", "Delete"]
+
   depends_on = [
-    azurerm_key_vault.kv_westeurope,
-    azurerm_user_assigned_identity.aks_kv_identity
+    azurerm_key_vault.kv_westeurope
   ]
 }
-
 # Secrets for Key Vault in Central India
 resource "azurerm_key_vault_secret" "db_username_secret_centralindia" {
   name         = "DbUsername"
