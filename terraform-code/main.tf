@@ -171,62 +171,89 @@ resource "azurerm_kubernetes_cluster_node_pool" "usernp2" {
  
   depends_on = [azurerm_subnet.vnet2_subnet2]
 }
-resource "azurerm_key_vault" "my_keyvault" {
-  name                       = "abhi-capstone-keyvault" # Changed Key Vault name as requested
-  location                   = var.location
+# Key Vault for Central India (primary region)
+resource "azurerm_key_vault" "kv_centralindia" {
+  name                       = "abhi-kv-central" # Unique name for Central India Key Vault
+  location                   = var.vnet1_location # Use the specific VNet location variable
   resource_group_name        = azurerm_resource_group.myrg.name
-  sku_name                   = "standard" # Use "premium" for HSM-backed keys
+  sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days = 7 # Minimum 7 days, max 90 days.
-  purge_protection_enabled   = true # Recommended for production: Prevents immediate permanent deletion
+  soft_delete_retention_days = 7
+  purge_protection_enabled   = true
 }
 
-# User Assigned Managed Identity: This identity will be used by AKS to access the Key Vault
+# Key Vault for West Europe (secondary region)
+resource "azurerm_key_vault" "kv_westeurope" {
+  name                       = "abhi-kv-west" # Unique name for West Europe Key Vault
+  location                   = var.vnet2_location # Use the specific VNet location variable
+  resource_group_name        = azurerm_resource_group.myrg.name
+  sku_name                   = "standard"
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days = 7
+  purge_protection_enabled   = true
+}
+
+# User Assigned Managed Identity (Remains single, as it can be assigned to multiple resources)
 resource "azurerm_user_assigned_identity" "aks_kv_identity" {
   resource_group_name = azurerm_resource_group.myrg.name
-  location            = var.location
+  location            = var.location # Can stay in the primary location or a common one
   name                = "abhi-aks-kv-identity"
 }
 
-# Key Vault Access Policy: Grants the User Assigned Identity permissions to read secrets
-resource "azurerm_key_vault_access_policy" "kv_access_for_aks" {
-  key_vault_id = azurerm_key_vault.my_keyvault.id
+# Access Policy for Key Vault in Central India
+resource "azurerm_key_vault_access_policy" "kv_access_for_aks_centralindia" {
+  key_vault_id = azurerm_key_vault.kv_centralindia.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_user_assigned_identity.aks_kv_identity.principal_id
 
-  secret_permissions = [
-    "Get",  # Allows AKS to retrieve the actual secret values
-    "List"  # Allows AKS to list the names of secrets (often needed by CSI driver)
-  ]
-
+  secret_permissions = ["Get", "List"]
   depends_on = [
-    azurerm_key_vault.my_keyvault,
+    azurerm_key_vault.kv_centralindia,
     azurerm_user_assigned_identity.aks_kv_identity
   ]
 }
 
-# Key Vault Secret: Stores the database username. Value comes from a Terraform variable.
-resource "azurerm_key_vault_secret" "db_username_secret" {
-  name         = "DbUsername" # The name of this secret within Azure Key Vault
-  value        = var.db_username # <-- VALUE COMES FROM YOUR INPUT (terminal or pipeline)
-  key_vault_id = azurerm_key_vault.my_keyvault.id
-  content_type = "text/plain" # Optional: Describes the type of content
+# Access Policy for Key Vault in West Europe
+resource "azurerm_key_vault_access_policy" "kv_access_for_aks_westeurope" {
+  key_vault_id = azurerm_key_vault.kv_westeurope.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_user_assigned_identity.aks_kv_identity.principal_id
 
+  secret_permissions = ["Get", "List"]
   depends_on = [
-    azurerm_key_vault.my_keyvault # Ensure Key Vault is created before storing secrets
+    azurerm_key_vault.kv_westeurope,
+    azurerm_user_assigned_identity.aks_kv_identity
   ]
 }
 
-# Key Vault Secret: Stores the database password. Value comes from a Terraform variable.
-resource "azurerm_key_vault_secret" "db_password_secret" {
-  name         = "DbPassword" # The name of this secret within Azure Key Vault
-  value        = var.db_password # <-- VALUE COMES FROM YOUR INPUT (terminal or pipeline)
-  key_vault_id = azurerm_key_vault.my_keyvault.id
-  content_type = "text/plain" # Optional: Describes the type of content
+# Secrets for Key Vault in Central India
+resource "azurerm_key_vault_secret" "db_username_secret_centralindia" {
+  name         = "DbUsername"
+  value        = var.db_username
+  key_vault_id = azurerm_key_vault.kv_centralindia.id
+  content_type = "text/plain"
+}
 
-  depends_on = [
-    azurerm_key_vault.my_keyvault # Ensure Key Vault is created before storing secrets
-  ]
+resource "azurerm_key_vault_secret" "db_password_secret_centralindia" {
+  name         = "DbPassword"
+  value        = var.db_password
+  key_vault_id = azurerm_key_vault.kv_centralindia.id
+  content_type = "text/plain"
+}
+
+# Secrets for Key Vault in West Europe
+resource "azurerm_key_vault_secret" "db_username_secret_westeurope" {
+  name         = "DbUsername"
+  value        = var.db_username
+  key_vault_id = azurerm_key_vault.kv_westeurope.id
+  content_type = "text/plain"
+}
+
+resource "azurerm_key_vault_secret" "db_password_secret_westeurope" {
+  name         = "DbPassword"
+  value        = var.db_password
+  key_vault_id = azurerm_key_vault.kv_westeurope.id
+  content_type = "text/plain"
 }
 
 variable "resource_group_name" {
