@@ -172,7 +172,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "usernp2" {
   depends_on = [azurerm_subnet.vnet2_subnet2]
 }
 resource "azurerm_key_vault" "my_keyvault" {
-  name                       = "abhi-keyvault" # Changed Key Vault name as requested
+  name                       = "abhi-capstone-keyvault" # Changed Key Vault name as requested
   location                   = var.location
   resource_group_name        = azurerm_resource_group.myrg.name
   sku_name                   = "standard" # Use "premium" for HSM-backed keys
