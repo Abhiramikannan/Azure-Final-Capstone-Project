@@ -8,173 +8,212 @@ terraform {
 
   # THIS IS THE CORRECT PLACE FOR THE BACKEND BLOCK
   backend "azurerm" {
-    resource_group_name  = "abhi-resource-group"    # Ensure this is the RG name where your Storage Account is (for state)
-    storage_account_name = "abhicapstonestorage"   # Ensure this is the exact SA name you created (for state)
-    container_name       = "tfstate"                # This is the container you created inside the SA
-    key                  = "terraform.tfstate"      # The name of the state file blob
+    resource_group_name  = "abhi-resource-group"     # Ensure this is the RG name where your Storage Account is (for state)
+    storage_account_name = "abhicapstonestorage"     # Ensure this is the exact SA name you created (for state)
+    container_name       = "tfstate"                 # This is the container you created inside the SA
+    key                  = "terraform.tfstate"       # The name of the state file blob
   }
- 
 }
 
 provider "azurerm" {
   features {}
 }
+
+# Data source to get the current tenant ID (needed for Key Vault and identity access)
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "myrg" {
   name     = var.resource_group_name
   location = var.location
 }
- 
+
 resource "azurerm_container_registry" "acr" {
   name                = "abhiacr1"
   resource_group_name = azurerm_resource_group.myrg.name
   location            = azurerm_resource_group.myrg.location
   sku                 = "Standard"
-  admin_enabled       = true
- 
+  admin_enabled       = true # Enable admin user for push/pull (consider service principals for prod)
+
   identity {
-    type = "SystemAssigned"
+    type = "SystemAssigned" # ACR's identity can be SystemAssigned for its own operations
   }
- 
+
   depends_on = [azurerm_resource_group.myrg]
 }
- 
-# VNet 1 in Central India (renamed abhi-vnet1)
+
+# ==============================================================================================
+# Virtual Networks and Subnets
+# ==============================================================================================
+
+# VNet 1 in Central India (Primary VNet for AKS)
 resource "azurerm_virtual_network" "vnet1" {
   name                = "abhi-vnet1"
   address_space       = ["10.10.0.0/16"]
   location            = var.vnet1_location
   resource_group_name = var.resource_group_name
- 
+
   depends_on = [azurerm_resource_group.myrg]
 }
- 
+
 resource "azurerm_subnet" "vnet1_subnet1" {
-  name                 = "abhi-vnet1-subnet1"
+  name                 = "abhi-vnet1-subnet1" # Subnet for AKS default node pool
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet1.name
   address_prefixes     = ["10.10.1.0/24"]
- 
+
   depends_on = [azurerm_virtual_network.vnet1]
 }
- 
+
 resource "azurerm_subnet" "vnet1_subnet2" {
-  name                 = "abhi-vnet1-subnet2"
+  name                 = "abhi-vnet1-subnet2" # Subnet for AKS user node pool
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet1.name
   address_prefixes     = ["10.10.2.0/24"]
- 
+
   depends_on = [azurerm_virtual_network.vnet1]
 }
- 
-# VNet 2 in East US (renamed abhi-vnet2)
+
+# VNet 2 in West Europe (Secondary VNet for AKS)
 resource "azurerm_virtual_network" "vnet2" {
   name                = "abhi-vnet2"
   address_space       = ["10.20.0.0/16"]
   location            = var.vnet2_location
   resource_group_name = var.resource_group_name
- 
+
   depends_on = [azurerm_resource_group.myrg]
 }
- 
+
 resource "azurerm_subnet" "vnet2_subnet1" {
-  name                 = "abhi-vnet2-subnet1"
+  name                 = "abhi-vnet2-subnet1" # Subnet for AKS default node pool
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet2.name
   address_prefixes     = ["10.20.1.0/24"]
- 
+
   depends_on = [azurerm_virtual_network.vnet2]
 }
- 
+
 resource "azurerm_subnet" "vnet2_subnet2" {
-  name                 = "abhi-vnet2-subnet2"
+  name                 = "abhi-vnet2-subnet2" # Subnet for AKS user node pool
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet2.name
   address_prefixes     = ["10.20.2.0/24"]
- 
+
   depends_on = [azurerm_virtual_network.vnet2]
 }
- 
+
+# ==============================================================================================
+# User Assigned Managed Identity (Used by AKS to access Key Vaults)
+# This identity needs to be created BEFORE AKS clusters are configured to use it.
+# ==============================================================================================
+resource "azurerm_user_assigned_identity" "aks_kv_identity" {
+  resource_group_name = azurerm_resource_group.myrg.name
+  location            = var.location # Can stay in the primary location or a common one
+  name                = "abhi-aks-kv-identity"
+}
+
+
+# ==============================================================================================
+# AKS Clusters (NOW CORRECTLY USING User Assigned Identity for Key Vault access)
+# ==============================================================================================
+
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = "abhiaks1"
   location            = var.vnet1_location
   resource_group_name = var.resource_group_name
   dns_prefix          = "abhiaks1"
- 
+
   default_node_pool {
     name           = "primarynp1"
     node_count     = 1
     vm_size        = "Standard_B2s"
     vnet_subnet_id = azurerm_subnet.vnet1_subnet1.id
   }
- 
+
+  # **CRITICAL FIX APPLIED HERE**
   identity {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.aks_kv_identity.id]
   }
- 
+
   network_profile {
     network_plugin    = "azure"
     load_balancer_sku = "standard"
     network_policy    = "azure"
   }
- 
-  depends_on = [azurerm_subnet.vnet1_subnet1]
+
+  # **CRITICAL DEPENDENCY ADDED HERE**
+  depends_on = [
+    azurerm_subnet.vnet1_subnet1,
+    azurerm_user_assigned_identity.aks_kv_identity # Explicit dependency on the managed identity
+  ]
 }
- 
+
 resource "azurerm_kubernetes_cluster_node_pool" "usernp" {
   name                  = "primarynp2"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   vm_size               = "Standard_B2s"
   node_count            = 1
-  mode                  = "User"
+  mode                  = "User" # Defines this as a user node pool
   vnet_subnet_id        = azurerm_subnet.vnet1_subnet2.id
   orchestrator_version  = azurerm_kubernetes_cluster.aks.kubernetes_version
- 
+
   depends_on = [azurerm_subnet.vnet1_subnet2]
 }
- 
+
 resource "azurerm_kubernetes_cluster" "aks2" {
   name                = "abhi-aks2"
   location            = var.vnet2_location
   resource_group_name = var.resource_group_name
   dns_prefix          = "abhiaks2"
- 
+
   default_node_pool {
     name           = "secondarynp1"
     node_count     = 1
     vm_size        = "Standard_B2s"
     vnet_subnet_id = azurerm_subnet.vnet2_subnet1.id
   }
- 
+
+  # **CRITICAL FIX APPLIED HERE**
   identity {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.aks_kv_identity.id]
   }
- 
+
   network_profile {
     network_plugin    = "azure"
     load_balancer_sku = "standard"
     network_policy    = "azure"
   }
- 
-  depends_on = [azurerm_subnet.vnet2_subnet1]
+
+  # **CRITICAL DEPENDENCY ADDED HERE**
+  depends_on = [
+    azurerm_subnet.vnet2_subnet1,
+    azurerm_user_assigned_identity.aks_kv_identity # Explicit dependency on the managed identity
+  ]
 }
- 
+
 resource "azurerm_kubernetes_cluster_node_pool" "usernp2" {
   name                  = "secondarynp2"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks2.id
   vm_size               = "Standard_B2s"
   node_count            = 1
-  mode                  = "User"
+  mode                  = "User" # Defines this as a user node pool
   vnet_subnet_id        = azurerm_subnet.vnet2_subnet2.id
   orchestrator_version  = azurerm_kubernetes_cluster.aks2.kubernetes_version
- 
+
   depends_on = [azurerm_subnet.vnet2_subnet2]
 }
+
+# ==============================================================================================
+# Azure Key Vaults and Secrets (One per region for high availability)
+# ==============================================================================================
+
 # Key Vault for Central India (primary region)
 resource "azurerm_key_vault" "kv_centralindia" {
-  name                       = "abhi-kv-central" # Unique name for Central India Key Vault
-  location                   = var.vnet1_location # Use the specific VNet location variable
+  # IMPORTANT: Make these names highly unique to avoid "VaultAlreadyExists" errors!
+  # Consider adding random strings or more specific identifiers.
+  name                       = "abhi-kv-central-india" 
+  location                   = var.vnet1_location # Uses the specific VNet location variable
   resource_group_name        = azurerm_resource_group.myrg.name
   sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -184,20 +223,15 @@ resource "azurerm_key_vault" "kv_centralindia" {
 
 # Key Vault for West Europe (secondary region)
 resource "azurerm_key_vault" "kv_westeurope" {
-  name                       = "abhi-kv-west" # Unique name for West Europe Key Vault
-  location                   = var.vnet2_location # Use the specific VNet location variable
+  # IMPORTANT: Make these names highly unique to avoid "VaultAlreadyExists" errors!
+  # Consider adding random strings or more specific identifiers.
+  name                       = "abhi-kv-west-us" 
+  location                   = var.vnet2_location # Uses the specific VNet location variable
   resource_group_name        = azurerm_resource_group.myrg.name
   sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
-}
-
-# User Assigned Managed Identity (Remains single, as it can be assigned to multiple resources)
-resource "azurerm_user_assigned_identity" "aks_kv_identity" {
-  resource_group_name = azurerm_resource_group.myrg.name
-  location            = var.location # Can stay in the primary location or a common one
-  name                = "abhi-aks-kv-identity"
 }
 
 # Access Policy for Key Vault in Central India
