@@ -169,39 +169,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "usernp2" {
  
   depends_on = [azurerm_subnet.vnet2_subnet2]
 }
-resource "azurerm_cosmosdb_account" "mongodb_account" {
-  name                = "abhi-db-cluster"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.myrg.name
-  
-  # Corrected: kind for vCore
-  kind                = "MongoDBvCore" 
-  # Corrected: MongoDB version
-  mongo_server_version = "8.0" 
 
-  # Corrected: For vCore, use a 'sku' block instead of 'offer_type'
-  sku {
-    name = "CosmosDBMongoDBvCoreStandard_M20" # This maps to "M20 tier, 2 vCores, 4 GiB RAM"
-    # If your storage is not 32 GiB, check the azurerm docs for how to specify storage for this SKU
-  }
-
-  # Consistency policy - (from your previous code, assuming Session is correct)
-  consistency_policy {
-    consistency_level       = "Session" 
-    # If consistency_level is "BoundedStaleness", UNCOMMENT and fill these:
-    # max_interval_in_seconds = <VALUE_FROM_PORTAL>
-    # max_staleness_prefix    = <VALUE_FROM_PORTAL>
-  }
-
-  # Geo-locations (from your previous code)
-  geo_location {
-    location          = var.location
-    failover_priority = 0
-  }
-
-  # Public network access (from your previous code, assuming it's enabled)
-  public_network_access_enabled = true 
-}
 variable "resource_group_name" {
   description = "The name of the Resource Group"
   type        = string
