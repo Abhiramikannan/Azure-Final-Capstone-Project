@@ -16,6 +16,7 @@ backend "azurerm" {
     container_name       = "tfstate"                  # Replace with the Container name you created
     key                  = "terraform.tfstate"        # Name of the state file blob
   }
+}
  
 resource "azurerm_resource_group" "myrg" {
   name     = var.resource_group_name
