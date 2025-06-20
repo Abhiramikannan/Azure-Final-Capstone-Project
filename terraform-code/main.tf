@@ -9,7 +9,7 @@ terraform {
   # THIS IS THE CORRECT PLACE FOR THE BACKEND BLOCK
   backend "azurerm" {
     resource_group_name  = "abhi-resource-group"    # Ensure this is the RG name where your Storage Account is (for state)
-    storage_account_name = "abhistorageacccount1"   # Ensure this is the exact SA name you created (for state)
+    storage_account_name = "abhicapstonestorage"   # Ensure this is the exact SA name you created (for state)
     container_name       = "tfstate"                # This is the container you created inside the SA
     key                  = "terraform.tfstate"      # The name of the state file blob
   }
