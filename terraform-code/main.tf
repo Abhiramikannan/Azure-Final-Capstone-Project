@@ -170,38 +170,38 @@ resource "azurerm_kubernetes_cluster_node_pool" "usernp2" {
   depends_on = [azurerm_subnet.vnet2_subnet2]
 }
 resource "azurerm_cosmosdb_account" "mongodb_account" {
-  name                = "abhi-db-cluster" # Must match the exact name of your database in Azure
-  location            = var.location      # Or specific location variable if different
+  name                = "abhi-db-cluster"
+  location            = var.location
   resource_group_name = azurerm_resource_group.myrg.name
-  offer_type          = "Standard"        # Or "Standard" / "Cassandra" / "Gremlin" / "Table"
-  kind                = "MongoDB"         # Must be "MongoDB" as shown in your screenshot
-  mongo_server_version = "4.0"           # Check your Cosmos DB settings in Azure for the exact version
+  
+  # Corrected: kind for vCore
+  kind                = "MongoDBvCore" 
+  # Corrected: MongoDB version
+  mongo_server_version = "8.0" 
 
-  # You MUST add a consistency_policy block. Check your existing DB for its consistency level.
-  # Example:
-  consistency_policy {
-    consistency_level       = "Session" # Common value, check your portal for exact
-    # If consistency_level is "BoundedStaleness", add:
-    # max_interval_in_seconds = 5
-    # max_staleness_prefix    = 100
+  # Corrected: For vCore, use a 'sku' block instead of 'offer_type'
+  sku {
+    name = "CosmosDBMongoDBvCoreStandard_M20" # This maps to "M20 tier, 2 vCores, 4 GiB RAM"
+    # If your storage is not 32 GiB, check the azurerm docs for how to specify storage for this SKU
   }
 
-  # Add geo_locations. If you only have one region, it will look like this:
+  # Consistency policy - (from your previous code, assuming Session is correct)
+  consistency_policy {
+    consistency_level       = "Session" 
+    # If consistency_level is "BoundedStaleness", UNCOMMENT and fill these:
+    # max_interval_in_seconds = <VALUE_FROM_PORTAL>
+    # max_staleness_prefix    = <VALUE_FROM_PORTAL>
+  }
+
+  # Geo-locations (from your previous code)
   geo_location {
-    location          = var.location # Or the primary region of your DB
+    location          = var.location
     failover_priority = 0
   }
 
-  # If you have firewall rules set up manually, you'll need to replicate them here
-  # ip_range_filter = "0.0.0.0,10.0.0.0" # Example
-
-  # If you enabled public access from Azure services (as suggested in one of your images)
-  public_network_access_enabled = true # Or false if you use VNet integration
-
-  # Any other properties configured in your existing database that are relevant
-  # e.g., capabilities, backup, etc.
+  # Public network access (from your previous code, assuming it's enabled)
+  public_network_access_enabled = true 
 }
- 
 variable "resource_group_name" {
   description = "The name of the Resource Group"
   type        = string
