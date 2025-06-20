@@ -10,6 +10,12 @@ terraform {
 provider "azurerm" {
   features {}
 }
+backend "azurerm" {
+    resource_group_name  = "abhi-resource-group"               # Replace with the RG name you created
+    storage_account_name = "abhistorageacccount1" # Replace with the SA name you created
+    container_name       = "tfstate"                  # Replace with the Container name you created
+    key                  = "terraform.tfstate"        # Name of the state file blob
+  }
  
 resource "azurerm_resource_group" "myrg" {
   name     = var.resource_group_name
