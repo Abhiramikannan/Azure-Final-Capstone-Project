@@ -5,19 +5,20 @@ terraform {
       version = "~>3.0"
     }
   }
-}
+
+  # THIS IS THE CORRECT PLACE FOR THE BACKEND BLOCK
+  backend "azurerm" {
+    resource_group_name  = "abhi-resource-group"    # Ensure this is the RG name where your Storage Account is (for state)
+    storage_account_name = "abhistorageacccount1"   # Ensure this is the exact SA name you created (for state)
+    container_name       = "tfstate"                # This is the container you created inside the SA
+    key                  = "terraform.tfstate"      # The name of the state file blob
+  }
  
+}
+
 provider "azurerm" {
   features {}
 }
-backend "azurerm" {
-    resource_group_name  = "abhi-resource-group"               # Replace with the RG name you created
-    storage_account_name = "abhistorageacccount1" # Replace with the SA name you created
-    container_name       = "tfstate"                  # Replace with the Container name you created
-    key                  = "terraform.tfstate"        # Name of the state file blob
-  }
-}
- 
 resource "azurerm_resource_group" "myrg" {
   name     = var.resource_group_name
   location = var.location
