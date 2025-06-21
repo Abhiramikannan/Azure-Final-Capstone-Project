@@ -244,7 +244,7 @@ resource "azurerm_key_vault_access_policy" "kv_access_for_terraform_executor_cen
 
   # THIS IS YOUR OBJECT ID FROM THE PREVIOUS ERROR MESSAGE
   # 'oid=3cb026dd-3f46-470c-b65c-e0bd92d4fd19'
-  object_id    = "3cb026dd-3f46-470c-b65c-e0bd92d4fd19" 
+  object_id    = "1c6ad34d-73d1-4c1a-b38d-735be951325d" 
 
   # Permissions needed for Terraform to 'Get', 'List', 'Set' (create/update), and 'Delete' secrets
   secret_permissions = ["Get", "List", "Set", "Delete"]
@@ -260,7 +260,7 @@ resource "azurerm_key_vault_access_policy" "kv_access_for_terraform_executor_wes
 
   # THIS IS YOUR OBJECT ID FROM THE PREVIOUS ERROR MESSAGE
   # 'oid=3cb026dd-3f46-470c-b65c-e0bd92d4fd19'
-  object_id    = "3cb026dd-3f46-470c-b65c-e0bd92d4fd19"
+  object_id    = "1c6ad34d-73d1-4c1a-b38d-735be951325d"
 
   secret_permissions = ["Get", "List", "Set", "Delete"]
 
